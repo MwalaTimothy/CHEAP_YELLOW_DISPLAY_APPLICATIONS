@@ -1,0 +1,10 @@
+{
+  "name": "rollingclockmodular-webflasher",
+  "private": true,
+  "scripts": {
+    "build": "node build.js"
+  },
+  "devDependencies": {
+    "terser": "^5.31.0"
+  }
+}
