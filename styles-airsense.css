@@ -1,0 +1,103 @@
+/* Air Sense brand theme — overrides the shared design tokens in styles.css
+   for this page only. Values match Air-Sense-Platform/src/index.css's .dark
+   theme exactly (same oklch primitives) so this page reads as the same
+   product family as the dashboard, not a reskinned CYD Applications page. */
+:root {
+  --bg: oklch(0.08 0.02 240);
+  --bg-alt: oklch(0.12 0.025 240);
+  --ink: oklch(0.97 0.01 240);
+  --muted: oklch(0.62 0.02 240);
+  --muted-2: oklch(0.42 0.02 240);
+  --accent-1: oklch(0.65 0.2 200);
+  --accent-2: oklch(0.7 0.18 160);
+  --accent-grad: linear-gradient(120deg, var(--accent-1), var(--accent-2));
+  --glass-bg: oklch(0.14 0.025 240 / 0.55);
+  --glass-border: oklch(0.97 0.01 240 / 0.08);
+  --line: oklch(0.97 0.01 240 / 0.09);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 1px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 12px 32px -12px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 24px 70px -20px oklch(0.65 0.2 200 / 0.35);
+}
+
+body { background: var(--bg); }
+
+.nav { background: oklch(0.08 0.02 240 / 0.75); }
+
+.eyebrow-pill { background: oklch(0.65 0.2 200 / 0.12); border-color: oklch(0.65 0.2 200 / 0.22); }
+
+.hero-bg {
+  background:
+    radial-gradient(600px 320px at 15% 20%, oklch(0.65 0.2 200 / 0.24), transparent 60%),
+    radial-gradient(560px 320px at 85% 10%, oklch(0.7 0.18 160 / 0.22), transparent 60%);
+}
+
+.btn-ghost { background: oklch(0.97 0.01 240 / 0.06); color: var(--ink); border-color: var(--line); }
+.btn-ghost:hover { background: oklch(0.97 0.01 240 / 0.1); }
+.btn-outline:hover { border-color: var(--accent-1); color: var(--accent-1); }
+.nav-cta { background: var(--accent-grad); color: oklch(0.08 0.02 240) !important; }
+
+.highlight { background: var(--bg-alt); }
+
+.badge.touch { background: oklch(0.65 0.2 200 / 0.16); color: var(--accent-1); }
+.badge.notouch { background: oklch(0.7 0.18 160 / 0.16); color: var(--accent-2); }
+.badge.new { background: oklch(0.7 0.19 25 / 0.18); color: oklch(0.75 0.19 25); }
+.badge.live { background: oklch(0.7 0.18 160 / 0.18); color: var(--accent-2); }
+
+.paypal-box { background: oklch(0.65 0.2 200 / 0.1); border-color: oklch(0.65 0.2 200 / 0.35); color: var(--accent-1); }
+.kv a { color: var(--accent-1); }
+code { background: oklch(0.97 0.01 240 / 0.08); color: var(--ink); }
+
+/* ---------- Gateway display carousel ---------- */
+/* Mirrors the physical gateway's own onboard behavior: its LVGL dashboard
+   auto-advances through each connected room node's page. This strip loops
+   the same photos endlessly so the page communicates that behavior instead
+   of just describing it. Pure CSS (no JS) — a duplicated track scrolled by
+   -50%, so the seam between the last real image and the first repeat is
+   invisible as long as both halves are identical. */
+.scroll-strip {
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  background: var(--bg-alt);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.scroll-track {
+  display: flex;
+  width: max-content;
+  animation: scroll-strip 28s linear infinite;
+}
+.scroll-strip:hover .scroll-track { animation-play-state: paused; }
+.scroll-track figure {
+  margin: 0;
+  flex: 0 0 auto;
+  width: 300px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.scroll-track img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  display: block;
+}
+.scroll-track figcaption { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+.scroll-track figcaption strong { color: var(--ink); display: block; font-size: 13.5px; margin-bottom: 2px; }
+
+@keyframes scroll-strip {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-track { animation: none; }
+}
+
+/* ---------- Spec table (developer-facing detail, not just marketing copy) */
+.spec-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.spec-table th { text-align: left; color: var(--muted); font-weight: 600; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.spec-table td { padding: 8px 0; border-bottom: 1px solid var(--line); color: var(--ink); }
+.spec-table tr:last-child td, .spec-table tr:last-child th { border-bottom: none; }

@@ -8,8 +8,8 @@ const { minify } = require("terser");
 const ROOT = __dirname;
 const DIST = path.join(ROOT, "dist");
 
-const COPY_FILES = ["index.html", "apps.html", "styles.css"];
-const COPY_DIRS = ["manifests", "firmware"];
+const COPY_FILES = ["index.html", "apps.html", "airsense.html", "styles.css", "styles-airsense.css"];
+const COPY_DIRS = ["manifests", "firmware", "assets"];
 
 function copyRecursive(src, dest) {
   const stat = fs.statSync(src);
