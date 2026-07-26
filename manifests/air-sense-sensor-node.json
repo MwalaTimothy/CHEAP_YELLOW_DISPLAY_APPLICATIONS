@@ -1,0 +1,13 @@
+{
+  "name": "Air Sense Sensor Node",
+  "version": "1.0.0",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32-C3",
+      "parts": [
+        { "path": "../firmware/air-sense-sensor-node/firmware.merged.bin", "offset": 0 }
+      ]
+    }
+  ]
+}
