@@ -134,18 +134,25 @@
         <div class="device-card-head">
           <div>
             <h2>Gateway firmware</h2>
-            <span class="device-sub">v1.0.0 · ESP32 (CYD / ESP32-2432S028R)</span>
+            <span class="device-sub">v1.1.0 · ESP32 (CYD / ESP32-2432S028R)</span>
           </div>
           <div class="badge-row"><span class="badge live">Production</span></div>
         </div>
         <p class="app-desc">
           Dual-mode ESP32 firmware: ESP-NOW receiver for up to 4 Sensor Nodes plus a WiFi
-          uplink to the Air Sense backend, with a live LVGL touchscreen dashboard and
-          MicroSD offline backlog built in.
+          uplink to the Air Sense backend, with a live LVGL dashboard and MicroSD offline
+          backlog built in. Two display builds — pick whichever matches your screen.
         </p>
         <div class="install-row">
           <esp-web-install-button manifest="manifests/air-sense-gateway.json">
-            <button slot="activate" class="btn btn-primary btn-block">Install Gateway firmware</button>
+            <button slot="activate" class="btn btn-primary btn-block">Install Gateway firmware (Touch)</button>
+            <span slot="unsupported" class="unsupported">Your browser doesn't support Web Serial. Use Chrome or Edge on desktop.</span>
+            <span slot="not-allowed" class="not-allowed">Web Serial needs HTTPS. You're seeing this because the page isn't served securely.</span>
+          </esp-web-install-button>
+        </div>
+        <div class="install-row" style="margin-top:10px;">
+          <esp-web-install-button manifest="manifests/air-sense-gateway-notouch.json">
+            <button slot="activate" class="btn btn-outline btn-block">Install Gateway firmware (No-Touch / Auto-Scroll)</button>
             <span slot="unsupported" class="unsupported">Your browser doesn't support Web Serial. Use Chrome or Edge on desktop.</span>
             <span slot="not-allowed" class="not-allowed">Web Serial needs HTTPS. You're seeing this because the page isn't served securely.</span>
           </esp-web-install-button>
@@ -154,12 +161,12 @@
 
       <div class="glass device-card" data-aos="fade-up" data-aos-delay="80">
         <table class="spec-table">
-          <tr><th>Board</th><td>CYD (ESP32-2432S028R) — 2.8" ILI9341 touchscreen recommended; headless plain ESP32 + SD also supported</td></tr>
+          <tr><th>Board</th><td>CYD (ESP32-2432S028R) — 2.8" ILI9341; headless plain ESP32 + SD also supported</td></tr>
           <tr><th>Radios</th><td>ESP-NOW (room nodes) + WiFi (backend uplink)</td></tr>
-          <tr><th>Local display</th><td>LVGL dashboard, one page per node (max 4), tap-anywhere to advance</td></tr>
+          <tr><th>Touch build</th><td>Tap anywhere on screen to advance to the next node's page</td></tr>
+          <tr><th>No-Touch build</th><td>Same dashboard, auto-advances to the next node's page every 5s — for a CYD clone/plain ILI9341 with no XPT2046 touch chip</td></tr>
           <tr><th>Offline resilience</th><td>MicroSD backlog, auto-replay once WiFi returns — zero data loss</td></tr>
           <tr><th>Provisioning</th><td>WiFi captive portal on first boot; hold BOOT 3s to reprovision</td></tr>
-          <tr><th>Backend uplink</th><td>HTTPS to the tenant's ingest endpoint, per-tenant secret</td></tr>
         </table>
       </div>
     </div>
