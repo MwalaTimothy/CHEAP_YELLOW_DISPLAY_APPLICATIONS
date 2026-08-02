@@ -6,7 +6,7 @@ page. Built on [ESP Web Tools](https://esphome.github.io/esp-web-tools/) — vis
 Install, pick their device's serial port, and the firmware flashes straight from the page. No
 PlatformIO, no Arduino IDE, no drivers beyond what Chrome/Edge already have.
 
-Live at: `https://mwalatimothy.github.io/CHEAP_YELLO_DISPLAY_APPLICATIONS/` (once GitHub Pages
+Live at: `https://mwalatimothy.github.io/CHEAP_YELLOW_DISPLAY_APPLICATIONS/` (once GitHub Pages
 is enabled — see "Publishing" below).
 
 Built and maintained by [Timothy Mwala](https://mwalatimothy.github.io/Portfolio-/), embedded
@@ -18,6 +18,9 @@ systems engineer. Contact/support details are on `apps.html#support`.
   card linking into the showcase.
 - **`apps.html`** — Application Showcase. Searchable/filterable catalog (currently just Rolling
   Clock's 3 variants), Premium access ($10 one-time PayPal appreciation token), Support & contact.
+- **`airsense.html`** — Dedicated flashing page for the Air Sense IAQ platform's Gateway and
+  Sensor Node firmware (a separate project from Rolling Clock, sharing this same install
+  infrastructure). See "What's here today: Air Sense" below.
 
 Everything else from the original site-relaunch brief (About CYD, Why This Platform, How It
 Works as its own page, Supported Hardware, Project Gallery, Community, Roadmap, About The
@@ -43,6 +46,21 @@ Modular clock/weather firmware, offered as three variants:
 Premium v2/v3 are locked behind a one-time access code, unlocked with a **$10 USD one-time**
 PayPal appreciation token (not a strict license fee) — see `apps.html#premium` for the exact
 flow. There's no payment gateway integration here, it's a direct pay-then-get-a-code process.
+
+## What's here today: Air Sense
+
+Firmware for the [Air Sense](https://air-sense-platform.netlify.app) indoor air quality
+platform's hardware, flashed from `airsense.html` — a separate project from Rolling Clock, but
+sharing this same ESP Web Tools install flow:
+
+| Firmware | Board | Notes |
+|---|---|---|
+| Gateway (Touch) | ESP32 (CYD / ESP32-2432S028R) | ESP-NOW receiver for up to 4 Sensor Nodes + WiFi uplink; tap the touchscreen to page between nodes |
+| Gateway (No-Touch / Auto-Scroll) | ESP32 / CYD clone with no XPT2046 | Identical firmware, dashboard auto-advances between node pages on a timer instead |
+| Sensor Node | ESP32-C3 | One binary for every node — device ID/pairing is all zero-config, handled automatically over ESP-NOW, not baked into the build |
+
+Unlike Rolling Clock, none of this is built with PlatformIO — see "Updating Air Sense firmware"
+below for the actual (Arduino-CLI-based) build process.
 
 ## Deferred pages — and why
 
@@ -75,12 +93,12 @@ To add a new CYD application to the showcase:
 
 ## Publishing (GitHub Pages)
 
-1. Push this repo to `https://github.com/MwalaTimothy/CHEAP_YELLO_DISPLAY_APPLICATIONS`.
+1. Push this repo to `https://github.com/MwalaTimothy/CHEAP_YELLOW_DISPLAY_APPLICATIONS`.
 2. In the repo's **Settings → Pages**, set the source to `main` / `/ (root)`.
 3. GitHub Pages serves over HTTPS automatically, which Web Serial requires — no extra config
    needed.
 
-## Updating firmware
+## Updating Rolling Clock firmware
 
 Each variant's PlatformIO project already has a `merge_bin.py` post-build script that produces
 `firmware.merged.bin` (bootloader + partitions + app combined at their correct flash offsets) —
@@ -103,21 +121,64 @@ To ship a new build:
    install dialog, not used for compatibility checks).
 4. Commit and push.
 
+## Updating Air Sense firmware
+
+Source lives in the [Air-Sense-Platform](https://github.com/MwalaTimothy/Air-Sense-Platform)
+repo's `hardware/` folder, built with Arduino, not PlatformIO — `arduino-cli compile
+--export-binaries` produces the same bootloader+partitions+app merged binary ESP Web Tools
+needs, just under a `build/<fqbn>/<sketch>.ino.merged.bin` path inside the sketch folder instead
+of PlatformIO's convention. Same `../firmware/...` relative-path caveat as above applies.
+
+To ship a new build, for each of the three sketches:
+
+| Sketch | FQBN | Merged binary → copy to |
+|---|---|---|
+| `hardware/gateways/gateway` | `esp32:esp32:esp32:PartitionScheme=min_spiffs` | `firmware/air-sense-gateway/firmware.merged.bin` |
+| `hardware/gateways/gateway_notouch` | `esp32:esp32:esp32:PartitionScheme=min_spiffs` | `firmware/air-sense-gateway-notouch/firmware.merged.bin` |
+| `hardware/esp_now_nodes/sensor_node` | `esp32:esp32:lolin_c3_mini` | `firmware/air-sense-sensor-node/firmware.merged.bin` |
+
+**The sensor node MUST be built with the `lolin_c3_mini` FQBN, not plain `esp32:esp32:esp32`** —
+the actual hardware is an ESP32-C3, a different chip family entirely; a classic-ESP32 binary
+won't run on it (and in practice won't even compile clean against this sketch's C3-specific pin
+assignments). The Gateway needs `PartitionScheme=min_spiffs` specifically — its default
+partition scheme is too small once OTA + SD + WiFiManager + LVGL are all linked in (confirmed:
+"text section exceeds available space" on the default scheme).
+
+1. `arduino-cli compile --fqbn <fqbn above> --export-binaries <sketch folder>`
+2. Copy the resulting `.../build/<fqbn-dirname>/<sketch>.ino.merged.bin` over the matching file
+   here.
+3. Bump the `version` field in the matching `manifests/air-sense-*.json` file **and** the
+   matching `<span class="device-sub">` version label in `airsense.html` — the manifest version
+   is cosmetic-only (install dialog), the HTML label is a separate hardcoded string, both need
+   updating by hand, they don't derive from one source.
+4. If it's the Gateway, also bump `GATEWAY_FIRMWARE_VERSION` in `gateway.ino` (and its synced
+   `gateway_notouch.ino` copy) in the Air-Sense-Platform repo itself — that's what the Gateway
+   reports to its own OTA check-in, independent of this flasher.
+5. Commit and push both repos.
+
 ## Repo layout
 
 ```
 index.html              Home page
 apps.html               Application Showcase (search/filter, cards, Premium, Support)
-styles.css              shared design system (light theme, glassmorphism, buttons, cards)
+airsense.html            Air Sense Gateway/Sensor Node flashing page (separate project, same install flow)
+styles.css               shared design system (light theme, glassmorphism, buttons, cards)
+styles-airsense.css     airsense.html-specific styling
 app.js                  AOS/GSAP init + showcase search & category filtering
 manifests/
-  premium-version.json  ESP Web Tools manifest for the Rolling Clock Premium Version build
-  v2.json                ...for Premium v2
-  v3.json                ...for Premium v3
+  premium-version.json          ESP Web Tools manifest for the Rolling Clock Premium Version build
+  v2.json                        ...for Premium v2
+  v3.json                        ...for Premium v3
+  air-sense-gateway.json                  ...for the Air Sense Gateway (Touch)
+  air-sense-gateway-notouch.json          ...for the Air Sense Gateway (No-Touch / Auto-Scroll)
+  air-sense-sensor-node.json              ...for the Air Sense Sensor Node
 firmware/
   premium-version/firmware.merged.bin
   v2/firmware.merged.bin
   v3/firmware.merged.bin
+  air-sense-gateway/firmware.merged.bin
+  air-sense-gateway-notouch/firmware.merged.bin
+  air-sense-sensor-node/firmware.merged.bin
 ```
 
 ## Design system notes
