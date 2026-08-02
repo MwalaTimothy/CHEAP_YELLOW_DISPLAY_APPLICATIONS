@@ -83,7 +83,7 @@
       <div class="highlight" data-aos="fade-up" data-aos-delay="160">
         <div class="ico">📶</div>
         <h3>3. Provision it</h3>
-        <p>Gateways set up over a WiFi captive portal; Sensor Nodes over a serial command window. See <a href="#provisioning" style="color:var(--accent-1); font-weight:600;">Provisioning reference</a>.</p>
+        <p>Gateways set up over a WiFi captive portal; Sensor Nodes pair automatically over ESP-NOW, no typing required. See <a href="#provisioning" style="color:var(--accent-1); font-weight:600;">Provisioning reference</a>.</p>
       </div>
     </div>
   </div>
@@ -189,9 +189,8 @@
           <div class="badge-row"><span class="badge live">Production</span></div>
         </div>
         <p class="app-desc">
-          One binary flashes to every Sensor Node — site-specific config (device ID, Gateway
-          MAC, ESP-NOW channel) is set afterwards over a serial command window, not baked
-          into the build.
+          One binary flashes to every Sensor Node — it pairs with a Gateway automatically over
+          ESP-NOW after flashing, no device ID, Gateway address, or channel to type in.
         </p>
         <div class="install-row">
           <esp-web-install-button manifest="manifests/air-sense-sensor-node.json">
@@ -209,7 +208,7 @@
           <tr><th>Radio</th><td>ESP-NOW only — no WiFi connection made on this device</td></tr>
           <tr><th>Power</th><td>Mains/USB, always-on (ENS160 needs continuous warm-up)</td></tr>
           <tr><th>Send cadence</th><td>Averaged reading every 5s; RAM retry buffer if the Gateway is briefly unreachable</td></tr>
-          <tr><th>Provisioning</th><td>Serial command window at 115200 baud on first boot, or hold BOOT 3s</td></tr>
+          <tr><th>Provisioning</th><td>Automatic over ESP-NOW during the Gateway's pairing window; optional serial console at 115200 baud for advanced use</td></tr>
         </table>
       </div>
     </div>
@@ -233,13 +232,13 @@
       </div>
       <div class="panel glass" data-aos="fade-up" data-aos-delay="80">
         <h3>Sensor Node</h3>
-        <p>No WiFi radio — configuration happens over USB serial at 115200 baud:</p>
+        <p>No WiFi radio — pairs with the Gateway automatically over ESP-NOW, nothing to type in:</p>
         <ol style="font-size:14.5px; line-height:1.7; padding-left:18px; margin:0 0 12px 0; color:var(--ink);">
-          <li>Open a serial monitor; the node prints its pairing code (<code>AS-XXXXXX</code>) and a 5-minute config window</li>
-          <li><code>set deviceid ward1_sensor_02</code>, <code>set gateway AA:BB:CC:DD:EE:FF</code>, <code>set channel 11</code></li>
-          <li><code>save</code> to persist and continue boot — or let the window time out to keep prior values</li>
+          <li>Power it on while the Gateway's pairing window is open (open automatically for a few minutes after every Gateway boot, or reopened anytime with a quick tap of its button)</li>
+          <li>It finds the Gateway and joins within moments, self-assigned a MAC-derived device ID (e.g. <code>node-A1B2C3</code>) — no manual Gateway address or channel entry</li>
+          <li>It shows up under "Newly Detected" on the dashboard's Devices page — name it and assign it to a room from there</li>
         </ol>
-        <p class="muted">Same settings can be re-opened any time by holding BOOT for 3s at power-up.</p>
+        <p class="muted">Optional: a USB serial console at 115200 baud offers <code>help</code>, <code>show</code> (current pairing status), <code>set deviceid &lt;value&gt;</code> (rename without re-pairing), and <code>pair</code> (force a fresh pairing search — same effect as holding BOOT for 3s at power-up).</p>
       </div>
     </div>
   </div>
