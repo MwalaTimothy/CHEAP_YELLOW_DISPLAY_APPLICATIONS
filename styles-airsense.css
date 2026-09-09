@@ -292,9 +292,12 @@ section + section { padding-top: 0; }
   border-bottom: 1px solid var(--border-color);
   background: var(--color-surface-2);
 }
-/* Both photos are hand-held bench shots — a plain centre crop lands on the
-   desk behind the board. These pull the frame down onto the hardware. */
-[data-device-card="node"] .device-photo { object-position: center 55%; }
+/* The remaining bench shots are hand-held — a plain centre crop lands on the
+   desk behind the board, so this pulls the frame down onto the hardware. It
+   must not reach the product renders: this selector is (0,2,0) and would
+   otherwise beat .device-photo--render's (0,1,0) centring no matter which
+   rule comes last, cropping a contained cut-out off-centre in its frame. */
+[data-device-card="node"] .device-photo:not(.device-photo--render) { object-position: center 55%; }
 
 /* A transparent product cut-out, not a photograph. `cover` would crop the
    speaker off the top and butt the device against the frame edge; `contain`
