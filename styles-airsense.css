@@ -383,6 +383,42 @@ dialog.installer::backdrop { background: rgba(14, 24, 34, 0.45); }
 /* Variant chooser — a real radio group, so arrow keys work and a screen reader
    announces "1 of 2" instead of reading two unrelated buttons. */
 .variant { display: grid; gap: 9px; border: 0; padding: 0; margin: 0; }
+/* Same trap as esp-web-install-button below: `display: grid` above is an
+   author rule, so it outranks the user agent's `[hidden] { display: none }`
+   outright. Without this the JS can set .hidden all it likes and the
+   fieldset stays on screen — which is how the Gateway's display question
+   ended up in the Sensor Node dialog. */
+.variant[hidden] { display: none; }
+
+/* A tier that has no firmware build yet. Selectable-looking controls that
+   do nothing are worse than visibly unavailable ones, so these are really
+   disabled, not just styled down. */
+.variant label:has(input:disabled) { cursor: not-allowed; background: var(--color-surface-2); border-style: dashed; }
+.variant label:has(input:disabled) .variant-name,
+.variant label:has(input:disabled) .variant-desc { color: var(--color-muted); }
+.variant label:has(input:disabled):hover { border-color: var(--border-color); background: var(--color-surface-2); }
+.variant-name .code {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+.variant-name .soon {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  background: var(--color-surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
 .variant legend { padding: 0; }
 .variant label {
   display: flex;

@@ -28,13 +28,14 @@
     gateway: {
       title: "Install Air Sense Gateway",
       sub: "Gateway firmware v2.1.0 · ESP32-2432S028R",
-      hasVariants: true,
+      variants: "gateway",
+      installer: "gateway-touch",
       successText: "Gateway firmware v2.1.0 installed. Next, connect the Gateway to the facility network."
     },
     node: {
       title: "Install Air Sense Sensor Node",
       sub: "Sensor Node firmware v1.1.0 · ESP32-C3",
-      hasVariants: false,
+      variants: "node",
       installer: "node",
       successText: "Sensor Node firmware v1.1.0 installed. Next, power it on while the Gateway’s pairing window is open."
     }
@@ -101,7 +102,18 @@
   var dlg = $("#installer");
   var dlgTitle = $("[data-dlg-title]");
   var dlgSub = $("[data-dlg-sub]");
-  var variantGroup = $("[data-variant-group]");
+  var variantGroups = {};
+  $$("[data-variant-group]").forEach(function (el) {
+    variantGroups[el.getAttribute("data-variant-group")] = el;
+  });
+
+  // Which install button each choice mounts. A node family with no firmware
+  // build yet is simply absent here and its radio is disabled in the markup,
+  // so there is no path to flashing an image at a board it was not built for.
+  var VARIANT_INSTALLER = {
+    gateway: { "touch": "gateway-touch", "notouch": "gateway-notouch" },
+    node: { "default": "node" }
+  };
   var flashStatus = $("[data-flash-status]");
   var flashMsg = $("[data-flash-msg]");
   var progressWrap = $("[data-progress]");
@@ -119,9 +131,17 @@
     Object.keys(installers).forEach(function (k) { installers[k].hidden = (k !== key); });
   }
 
-  function currentGatewayInstaller() {
-    var choice = $("input[name='gw-variant']:checked");
-    return (choice && choice.value === "notouch") ? "gateway-notouch" : "gateway-touch";
+  function radioName(groupKey) {
+    return groupKey === "gateway" ? "gw-variant" : groupKey + "-variant";
+  }
+
+  function currentInstaller(device) {
+    if (!device.variants) return device.installer;
+    var choice = $("input[name='" + radioName(device.variants) + "']:checked");
+    var map = VARIANT_INSTALLER[device.variants] || {};
+    // Falling back to device.installer keeps the dialog usable if a checked
+    // value ever has no mapping, rather than mounting nothing at all.
+    return (choice && map[choice.value]) || device.installer;
   }
 
   function resetDialogState() {
@@ -140,8 +160,10 @@
 
     dlgTitle.textContent = device.title;
     dlgSub.textContent = device.sub;
-    if (variantGroup) variantGroup.hidden = !device.hasVariants;
-    showInstaller(device.hasVariants ? currentGatewayInstaller() : device.installer);
+    Object.keys(variantGroups).forEach(function (k) {
+      variantGroups[k].hidden = (k !== device.variants);
+    });
+    showInstaller(currentInstaller(device));
     resetDialogState();
 
     if (typeof dlg.showModal === "function") dlg.showModal();
@@ -152,10 +174,10 @@
     btn.addEventListener("click", function () { openInstaller(btn.getAttribute("data-open-installer")); });
   });
 
-  // Swapping the display variant swaps which real install button is mounted.
-  $$("input[name='gw-variant']").forEach(function (radio) {
+  // Swapping a variant swaps which real install button is mounted.
+  $$("[data-variant-group] input[type='radio']").forEach(function (radio) {
     radio.addEventListener("change", function () {
-      if (activeDevice === "gateway") showInstaller(currentGatewayInstaller());
+      if (activeDevice) showInstaller(currentInstaller(DEVICES[activeDevice]));
     });
   });
 
