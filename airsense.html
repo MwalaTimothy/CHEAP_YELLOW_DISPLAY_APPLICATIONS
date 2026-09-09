@@ -124,12 +124,16 @@
             <span class="badge">Production</span>
           </div>
           <p class="device-role">Room-level sensing node. One per monitored room.</p>
+          <!-- Capabilities, not part numbers. The ENS160/AHT21/I2C detail moved
+               to Advanced > "Sensor Node hardware and firmware detail" rather
+               than being dropped — a technician choosing a card needs to know
+               what the node does; an engineer checking their build still needs
+               the exact sensors, and can still find them. -->
           <ul class="feature-list">
-            <li><span class="tick" aria-hidden="true">&check;</span> ENS160 &mdash; eCO&#8322; and TVOC</li>
-            <li><span class="tick" aria-hidden="true">&check;</span> AHT21 &mdash; temperature and humidity</li>
-            <li><span class="tick" aria-hidden="true">&check;</span> Pairs with a Gateway by itself</li>
+            <li><span class="tick" aria-hidden="true">&check;</span> Indoor air quality for its assigned room</li>
+            <li><span class="tick" aria-hidden="true">&check;</span> Pairs with a Gateway and sends over its own radio link</li>
             <li><span class="tick" aria-hidden="true">&check;</span> Never joins the facility WiFi</li>
-            <li><span class="tick" aria-hidden="true">&check;</span> Averaged reading every 5 seconds</li>
+            <li><span class="tick" aria-hidden="true">&check;</span> Processes on the device, shares every 5 seconds</li>
           </ul>
           <div class="fw-row">
             <div>
