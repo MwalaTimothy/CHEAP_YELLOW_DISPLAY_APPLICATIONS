@@ -499,38 +499,40 @@
       </label>
     </fieldset>
 
-    <!-- Sensor Node: which board in the family. Only Default has firmware
-         today; the v2 tiers are listed so an installer holding one knows it
-         is a real product and not an unsupported board, and knows to keep
-         using the Default image until its own build ships. -->
+    <!-- Sensor Node: which board in the family. Descriptions say what each
+         tier measures, not what is fitted to it - the person at the bench is
+         picking the node that covers their room, not reviewing a BOM. Only
+         Default has a firmware build today; the rest are listed so an
+         installer holding one knows it is a real product, and disabled so
+         there is no path to flashing an image at a board it is not for. -->
     <fieldset class="variant" data-variant-group="node" hidden>
       <legend class="dlg-section-label">Which sensor node do you have?</legend>
       <label>
         <input type="radio" name="node-variant" value="default" checked />
         <span class="variant-text">
           <span class="variant-name">Default <span class="rec">Recommended</span></span>
-          <span class="variant-desc">ENS160 + AHT21 on an ESP32-C3. The node this firmware is built for, and the one in the field today.</span>
+          <span class="variant-desc">The node this firmware is built for. In the field today.</span>
         </span>
       </label>
       <label>
         <input type="radio" name="node-variant" value="basic" disabled />
         <span class="variant-text">
           <span class="variant-name">Basic <span class="code">AS-N-B</span> <span class="soon">Firmware in development</span></span>
-          <span class="variant-desc">SHT45 + BMP280 on a 50&nbsp;mm disc. Battery-first — around 300 days on one cell. Flash the Default image for now.</span>
+          <span class="variant-desc">Temperature, humidity and pressure.</span>
         </span>
       </label>
       <label>
         <input type="radio" name="node-variant" value="standard" disabled />
         <span class="variant-text">
           <span class="variant-name">Standard <span class="code">AS-N-S</span> <span class="soon">Firmware in development</span></span>
-          <span class="variant-desc">Adds CO&#8322; (SCD41), VOC (SGP41) and presence detection. Battery or mains, about three weeks on a cell.</span>
+          <span class="variant-desc">Adds CO&#8322;, VOC and presence.</span>
         </span>
       </label>
       <label>
         <input type="radio" name="node-variant" value="pro" disabled />
         <span class="variant-text">
           <span class="variant-name">Pro <span class="code">AS-N-P</span> <span class="soon">Firmware in development</span></span>
-          <span class="variant-desc">Adds particulate (SPS30) and CO. Mains powered with battery backup — the fan rules out running it on a cell.</span>
+          <span class="variant-desc">Adds particulate (PM1, PM2.5, PM10) and carbon monoxide.</span>
         </span>
       </label>
     </fieldset>
