@@ -3,270 +3,549 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Air Sense — Flash Gateway &amp; Sensor Node Firmware</title>
-<meta name="description" content="Flash Air Sense Gateway and Sensor Node firmware straight from your browser — no IDE, no drivers, just USB and Chrome." />
+<title>Air Sense | Gateway &amp; Sensor Node Firmware</title>
+<meta name="description" content="Flash and provision Air Sense Gateway and Sensor Node firmware directly from your browser. Production firmware for ESP32-based indoor air quality monitoring hardware." />
 <link rel="icon" href="assets/air-sense-favicon.png" />
-<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
-<link rel="stylesheet" href="styles.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles-airsense.css" />
-<style>
-  .as-hero { padding: 64px 0 40px; text-align: center; }
-  .as-logo { height: 34px; margin-bottom: 28px; }
-  .device-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
-  @media (max-width: 820px) { .device-grid { grid-template-columns: 1fr; } }
-  .device-card { padding: 30px; }
-  .device-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-  .device-card h2 { font-size: 21px; margin: 0 0 4px 0; }
-  .device-card .device-sub { font-size: 13px; color: var(--muted); }
-  .device-card .app-desc { font-size: 14px; color: var(--muted); line-height: 1.6; margin: 0 0 18px 0; }
-  .device-icon { font-size: 26px; }
-</style>
+<!-- ESP Web Tools does the real work: USB connect, chip detect, erase, write,
+     verify. Nothing on this page reimplements or simulates any of it. -->
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js"></script>
 </head>
-<body class="airsense">
+<body>
 
-<nav class="nav">
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<!-- ================= NAVIGATION ================= -->
+<nav class="nav" aria-label="Primary">
   <div class="wrap">
-    <a class="brand" href="airsense.html"><img class="as-logo" style="height:22px; margin:0;" src="assets/air-sense-logo.png" alt="Air Sense" /></a>
-    <div class="nav-links">
-      <a href="#gateway">Gateway</a>
-      <a href="#sensor-node">Sensor Node</a>
+    <a class="brand" href="airsense.html" aria-label="Air Sense Field Console — home">
+      <span class="logo-plate"><img src="assets/air-sense-logo.png" alt="Air Sense" /></span>
+      <span class="wordmark">Field Console</span>
+    </a>
+
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu" data-nav-toggle>
+      <svg width="18" height="14" viewBox="0 0 18 14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M1 1h16M1 7h16M1 13h16" />
+      </svg>
+    </button>
+
+    <div class="nav-links" id="nav-links" data-nav-links>
+      <a href="#install">Install</a>
+      <a href="#how">How it works</a>
       <a href="#provisioning">Provisioning</a>
-      <a href="index.html">CYD Applications ↗</a>
-      <a href="#gateway" class="nav-cta">Flash a device</a>
+      <a href="#help">Help</a>
+    </div>
+
+    <div class="nav-actions">
+      <span class="pill" data-global-status data-state="ready"><span class="dot"></span><span data-global-status-text>Ready</span></span>
+      <a class="btn btn-primary btn-nav-cta" href="#install">Flash a device</a>
     </div>
   </div>
 </nav>
 
-<header class="hero as-hero">
-  <div class="hero-bg"></div>
+<main id="main">
+
+<!-- ================= HERO ================= -->
+<header class="hero">
   <div class="wrap">
-    <img class="as-logo" src="assets/air-sense-logo.png" alt="Air Sense" />
-    <div class="eyebrow-pill hero-eyebrow">⚡ Flash straight from your browser</div>
-    <h1 class="display hero-title">Field hardware for <span class="grad">enterprise indoor<br />air quality</span></h1>
-    <p class="lede hero-lede">
-      Flash an Air Sense Gateway or Sensor Node directly from this page over USB —
-      the same firmware running in every deployed facility, no toolchain required
-      for install or replacement in the field.
+    <p class="eyebrow">Air Sense Field Console</p>
+    <h1>Flash. Provision. <span class="accent">Deploy.</span></h1>
+    <p class="hero-lede">
+      Firmware deployment for Air Sense hardware. Install a Gateway or Sensor Node
+      straight from this browser tab over USB — no development toolchain, on any
+      machine, in the field or on the bench.
     </p>
-    <div class="cta-row hero-cta">
-      <a class="btn btn-primary" href="#gateway">Install Gateway firmware</a>
-      <a class="btn btn-outline" href="#sensor-node">Install Sensor Node firmware</a>
-      <a class="btn btn-ghost" href="#provisioning">Provisioning reference</a>
+    <div class="hero-cta">
+      <button class="btn btn-primary" type="button" data-open-installer="gateway">Flash a Gateway</button>
+      <button class="btn btn-outline" type="button" data-open-installer="node">Flash a Sensor Node</button>
     </div>
-    <p class="browser-note hero-note">
-      Works in Chrome, Edge, or Opera on desktop — powered by the Web Serial API, which
-      Firefox, Safari, and mobile browsers don't support yet.
-    </p>
+    <ul class="hero-facts">
+      <li>No PlatformIO</li>
+      <li>No Arduino IDE</li>
+      <li>Browser based</li>
+      <li>USB required</li>
+    </ul>
   </div>
 </header>
 
-<section>
+<!-- ================= DEVICE SELECTOR ================= -->
+<section id="install">
   <div class="wrap">
-    <p class="section-eyebrow center">How it works</p>
-    <h2 class="section-title center">From browser tab to running firmware</h2>
-    <p class="section-lede center">No PlatformIO, no Arduino IDE, no drivers beyond what your browser already has.</p>
-    <div class="highlight-grid">
-      <div class="highlight" data-aos="fade-up" data-aos-delay="0">
-        <div class="ico">🔌</div>
-        <h3>1. Plug in over USB</h3>
-        <p>Connect the Gateway (CYD) or Sensor Node (ESP32-C3) and click its Install button below.</p>
-      </div>
-      <div class="highlight" data-aos="fade-up" data-aos-delay="80">
-        <div class="ico">🖥️</div>
-        <h3>2. Pick the port</h3>
-        <p>Choose the device's serial port when Chrome prompts you, then let it flash — a couple of minutes.</p>
-      </div>
-      <div class="highlight" data-aos="fade-up" data-aos-delay="160">
-        <div class="ico">📶</div>
-        <h3>3. Provision it</h3>
-        <p>Gateways set up over a WiFi setup page; Sensor Nodes pair themselves wirelessly, no typing required. See <a href="#provisioning" style="color:var(--accent-1); font-weight:600;">Provisioning reference</a>.</p>
-      </div>
+    <div class="section-head">
+      <p class="eyebrow">Step one</p>
+      <h2>What are you installing?</h2>
+      <p class="lede">Pick the board in your hand. Each card shows the firmware version it will install before you commit to anything.</p>
     </div>
-  </div>
-</section>
-
-<section id="live-dashboard" style="padding-top:0;">
-  <div class="wrap">
-    <p class="section-eyebrow">Live on the hardware</p>
-    <h2 class="section-title">The Gateway's onboard dashboard</h2>
-    <p class="section-lede">
-      Every Gateway drives a live dashboard on its screen — one page per connected
-      Sensor Node, tap anywhere to advance, auto-labelled with delivery status
-      (<code>Forwarded</code> to the backend, or <code>Queued to SD</code> during a WiFi outage).
-      This strip loops real units running this exact firmware.
-    </p>
-    <div class="scroll-strip glass" data-aos="fade-up">
-      <div class="scroll-track">
-        <figure>
-          <img src="assets/gateway.jpg" alt="Air Sense Gateway on-screen dashboard showing test_sensor_01, packet #5, Queued to SD" />
-          <figcaption><strong>test_sensor_01 · packet #5</strong>Queued to SD — WiFi was down, so this reading backlogs to the MicroSD card and replays automatically once connectivity returns.</figcaption>
-        </figure>
-        <figure>
-          <img src="assets/sensor-node.jpg" alt="Three Air Sense Sensor Nodes on breadboards, labelled Living-room-01, Kitchen-01, and bed-room-01" />
-          <figcaption><strong>Three provisioned nodes</strong>Living-room-01, Kitchen-01, bed-room-01 — each sending its averaged reading wirelessly to the Gateway every 5s.</figcaption>
-        </figure>
-        <!-- duplicated for a seamless CSS loop — keep in sync with the set above -->
-        <figure aria-hidden="true">
-          <img src="assets/gateway.jpg" alt="" />
-          <figcaption><strong>test_sensor_01 · packet #5</strong>Queued to SD — WiFi was down, so this reading backlogs to the MicroSD card and replays automatically once connectivity returns.</figcaption>
-        </figure>
-        <figure aria-hidden="true">
-          <img src="assets/sensor-node.jpg" alt="" />
-          <figcaption><strong>Three provisioned nodes</strong>Living-room-01, Kitchen-01, bed-room-01 — each sending its averaged reading wirelessly to the Gateway every 5s.</figcaption>
-        </figure>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="gateway" style="padding-top:0;">
-  <div class="wrap">
-    <p class="section-eyebrow">Hardware · Hub</p>
-    <h2 class="section-title">Air Sense Gateway</h2>
-    <p class="section-lede">The always-on hub for one facility zone: listens for every Sensor Node over a direct wireless link, forwards readings to the backend over WiFi, and backlogs to a MicroSD card when the network is down. As of v2.1 it can also sound an audible alarm the moment a room crosses a threshold.</p>
 
     <div class="device-grid">
-      <div class="device-card glass" data-aos="fade-up">
-        <div class="device-card-head">
-          <div>
-            <h2>Gateway firmware</h2>
-            <span class="device-sub">v2.1.0 · ESP32 (CYD / ESP32-2432S028R)</span>
-          </div>
-          <div class="badge-row"><span class="badge live">Production</span></div>
-        </div>
-        <p class="app-desc">
-          Dual-radio firmware: receives from up to 4 Sensor Nodes over a direct wireless
-          link, and forwards to the Air Sense backend over WiFi — with a live touch
-          dashboard, audible alerts, and MicroSD offline backlog built in. Two display
-          builds — pick whichever matches your screen.
-        </p>
-        <div class="install-row">
-          <esp-web-install-button manifest="manifests/air-sense-gateway.json">
-            <button slot="activate" class="btn btn-primary btn-block">Install Gateway firmware (Touch + Audio Alerts)</button>
-            <span slot="unsupported" class="unsupported">Your browser doesn't support Web Serial. Use Chrome or Edge on desktop.</span>
-            <span slot="not-allowed" class="not-allowed">Web Serial needs HTTPS. You're seeing this because the page isn't served securely.</span>
-          </esp-web-install-button>
-        </div>
-        <div class="install-row" style="margin-top:10px;">
-          <esp-web-install-button manifest="manifests/air-sense-gateway-notouch.json">
-            <button slot="activate" class="btn btn-outline btn-block">Install Gateway firmware (No-Touch / Auto-Scroll)</button>
-            <span slot="unsupported" class="unsupported">Your browser doesn't support Web Serial. Use Chrome or Edge on desktop.</span>
-            <span slot="not-allowed" class="not-allowed">Web Serial needs HTTPS. You're seeing this because the page isn't served securely.</span>
-          </esp-web-install-button>
-        </div>
-      </div>
 
-      <div class="glass device-card" data-aos="fade-up" data-aos-delay="80">
-        <table class="spec-table">
-          <tr><th>Board</th><td>CYD (ESP32-2432S028R) — 2.8" ILI9341; headless plain ESP32 + SD also supported</td></tr>
-          <tr><th>Radios</th><td>Direct wireless link to the room nodes + WiFi for the backend uplink</td></tr>
-          <tr><th>Touch build</th><td>Full touch interface — Home, per-node pages (Overview/Air Quality/Environment/Alerts/Node Info), live Alerts, and on-device Settings (theme, brightness, thresholds, sound, pairing, factory reset)</td></tr>
-          <tr><th>No-Touch build</th><td>Same dashboard, auto-advances to the next node's page every 5s — for a CYD clone/plain ILI9341 with no XPT2046 touch chip</td></tr>
-          <tr><th>Audible alerts</th><td>New in v2.1 — plugs a 35 x 25 mm 8 ohm speaker into the board's own speaker socket (no soldering). Sounds a two-beep warning or a repeating four-beep alarm when a room crosses a threshold, plus boot, pairing and touch feedback. Fully adjustable, and silenceable, from Settings &gt; Sound. Optional: with no speaker fitted the firmware behaves exactly as before</td></tr>
-          <tr><th>Offline resilience</th><td>MicroSD backlog, auto-replay once WiFi returns — zero data loss</td></tr>
-          <tr><th>Provisioning</th><td>WiFi setup page on first boot; hold BOOT 3s to reconfigure</td></tr>
-        </table>
-      </div>
+      <!-- Gateway -->
+      <article class="card device-card" data-device-card="gateway">
+        <img class="device-photo" src="assets/gateway.jpg" alt="An Air Sense Gateway held in one hand, its 2.8-inch screen showing a grid of live readings: temperature, humidity, CO2, TVOC, PM and AQI tiles." loading="lazy" width="1600" height="900" />
+        <div class="device-body">
+          <div class="device-head">
+            <div>
+              <h3>Gateway</h3>
+              <p class="chip">ESP32-2432S028R</p>
+            </div>
+            <span class="badge">Production</span>
+          </div>
+          <p class="device-role">Facility communication hub. One per zone, always powered.</p>
+          <ul class="feature-list">
+            <li><span class="tick" aria-hidden="true">&check;</span> 2.8&Prime; touchscreen dashboard</li>
+            <li><span class="tick" aria-hidden="true">&check;</span> WiFi uplink to the Air Sense backend</li>
+            <li><span class="tick" aria-hidden="true">&check;</span> Direct wireless link to Sensor Nodes</li>
+            <li><span class="tick" aria-hidden="true">&check;</span> MicroSD offline storage</li>
+            <li><span class="tick" aria-hidden="true">&check;</span> Audible threshold alerts</li>
+          </ul>
+          <div class="fw-row">
+            <div>
+              <div class="fw-label">Firmware</div>
+              <div class="fw-version">v2.1.0</div>
+            </div>
+            <span class="pill" data-device-status="gateway" data-state="ready" style="margin-left:auto;"><span class="dot"></span><span data-device-status-text>Ready</span></span>
+          </div>
+          <button class="btn btn-primary btn-block" type="button" data-open-installer="gateway" data-card-cta>Install Gateway</button>
+        </div>
+      </article>
+
+      <!-- Sensor Node -->
+      <article class="card device-card" data-device-card="node">
+        <img class="device-photo" src="assets/sensor-node.jpg" alt="Three Air Sense Sensor Nodes on small breadboards, hand-labelled Living-room-01, Kitchen-01 and bed-room-01." loading="lazy" width="1600" height="900" />
+        <div class="device-body">
+          <div class="device-head">
+            <div>
+              <h3>Sensor Node</h3>
+              <p class="chip">ESP32-C3</p>
+            </div>
+            <span class="badge">Production</span>
+          </div>
+          <p class="device-role">Room-level sensing node. One per monitored room.</p>
+          <ul class="feature-list">
+            <li><span class="tick" aria-hidden="true">&check;</span> ENS160 &mdash; eCO&#8322; and TVOC</li>
+            <li><span class="tick" aria-hidden="true">&check;</span> AHT21 &mdash; temperature and humidity</li>
+            <li><span class="tick" aria-hidden="true">&check;</span> Pairs with a Gateway by itself</li>
+            <li><span class="tick" aria-hidden="true">&check;</span> Never joins the facility WiFi</li>
+            <li><span class="tick" aria-hidden="true">&check;</span> Averaged reading every 5 seconds</li>
+          </ul>
+          <div class="fw-row">
+            <div>
+              <div class="fw-label">Firmware</div>
+              <div class="fw-version">v1.1.0</div>
+            </div>
+            <span class="pill" data-device-status="node" data-state="ready" style="margin-left:auto;"><span class="dot"></span><span data-device-status-text>Ready</span></span>
+          </div>
+          <button class="btn btn-primary btn-block" type="button" data-open-installer="node" data-card-cta>Install Sensor Node</button>
+        </div>
+      </article>
+
     </div>
   </div>
 </section>
 
-<section id="sensor-node" style="padding-top:0;">
+<!-- ================= HOW IT WORKS ================= -->
+<section id="how">
   <div class="wrap">
-    <p class="section-eyebrow">Hardware · Room node</p>
-    <h2 class="section-title">Air Sense Sensor Node</h2>
-    <p class="section-lede">Always-on room monitor: samples temperature, humidity, eCO₂, and TVOC every few seconds and sends a lightly-averaged reading straight to the Gateway over its own wireless link. Mains/USB powered — no sleep, so the gas sensor stays warmed up.</p>
-
-    <div class="device-grid">
-      <div class="device-card glass" data-aos="fade-up">
-        <div class="device-card-head">
-          <div>
-            <h2>Sensor Node firmware</h2>
-            <span class="device-sub">v1.1.0 · ESP32-C3</span>
-          </div>
-          <div class="badge-row"><span class="badge live">Production</span></div>
-        </div>
-        <p class="app-desc">
-          One binary flashes to every Sensor Node — it finds and pairs with a Gateway by
-          itself after flashing, with no device ID, Gateway address, or radio channel to
-          type in.
-        </p>
-        <div class="install-row">
-          <esp-web-install-button manifest="manifests/air-sense-sensor-node.json">
-            <button slot="activate" class="btn btn-primary btn-block">Install Sensor Node firmware</button>
-            <span slot="unsupported" class="unsupported">Your browser doesn't support Web Serial. Use Chrome or Edge on desktop.</span>
-            <span slot="not-allowed" class="not-allowed">Web Serial needs HTTPS. You're seeing this because the page isn't served securely.</span>
-          </esp-web-install-button>
-        </div>
-      </div>
-
-      <div class="glass device-card" data-aos="fade-up" data-aos-delay="80">
-        <table class="spec-table">
-          <tr><th>Board</th><td>ESP32-C3 (this build's wired unit: SDA → GPIO8, SCL → GPIO10)</td></tr>
-          <tr><th>Sensors</th><td>ENS160 (eCO₂ + TVOC) + AHT21 (temp/humidity) combo, I2C</td></tr>
-          <tr><th>Radio</th><td>Direct wireless link to the Gateway only — this device never joins your WiFi network</td></tr>
-          <tr><th>Power</th><td>Mains/USB, always-on (ENS160 needs continuous warm-up)</td></tr>
-          <tr><th>Send cadence</th><td>Averaged reading every 5s; RAM retry buffer if the Gateway is briefly unreachable</td></tr>
-          <tr><th>Provisioning</th><td>Automatic, during the Gateway's pairing window; optional serial console at 115200 baud for advanced use</td></tr>
-        </table>
-      </div>
+    <div class="section-head">
+      <h2>How it works</h2>
+      <p class="lede">Four stages from a board in a box to a device reporting data.</p>
     </div>
+    <ol class="steps">
+      <li class="step">
+        <div class="num">01</div>
+        <h3>Connect</h3>
+        <p>Plug the device into your computer with a USB data cable.</p>
+      </li>
+      <li class="step">
+        <div class="num">02</div>
+        <h3>Flash</h3>
+        <p>Install production firmware from this page. Two to three minutes.</p>
+      </li>
+      <li class="step">
+        <div class="num">03</div>
+        <h3>Provision</h3>
+        <p>Configure the Gateway&rsquo;s network, or let a Sensor Node pair itself.</p>
+      </li>
+      <li class="step">
+        <div class="num">04</div>
+        <h3>Deploy</h3>
+        <p>Mount the hardware in its target room and confirm it is reporting.</p>
+      </li>
+    </ol>
   </div>
 </section>
 
+<!-- ================= PROVISIONING ================= -->
 <section id="provisioning">
   <div class="wrap">
-    <p class="section-eyebrow">After flashing</p>
-    <h2 class="section-title">Provisioning reference</h2>
-    <div class="panel-2col">
-      <div class="panel glass" data-aos="fade-up">
+    <div class="section-head">
+      <p class="eyebrow">After flashing</p>
+      <h2>Provisioning</h2>
+      <p class="lede">Flashing puts the firmware on the board. Provisioning is what tells it where it is and who it belongs to.</p>
+    </div>
+
+    <div class="prov-grid">
+      <div class="card prov-card">
         <h3>Gateway</h3>
-        <p>On first boot (or after a BOOT-hold reset), the Gateway broadcasts its own temporary WiFi network:</p>
-        <ol style="font-size:14.5px; line-height:1.7; padding-left:18px; margin:0 0 12px 0; color:var(--ink);">
-          <li>Connect a phone/laptop to <code>AirSense-Setup-XXXXXX</code></li>
-          <li>A setup page opens automatically — enter the facility WiFi credentials and the tenant's ingest secret</li>
-          <li>It reboots onto that network and starts forwarding readings</li>
+        <p class="role">Needs facility WiFi and a tenant secret. One-time, done from a phone or laptop.</p>
+        <ol class="flow">
+          <li><span class="marker">01</span><div><div class="title">Power on</div><div class="detail">On a first boot the Gateway broadcasts its own temporary WiFi network.</div></div></li>
+          <li><span class="marker">02</span><div><div class="title">Join the setup network</div><div class="detail">Connect a phone or laptop to <code>AirSense-Setup-XXXXXX</code>.</div></div></li>
+          <li><span class="marker">03</span><div><div class="title">Configure</div><div class="detail">A setup page opens by itself. Enter the facility WiFi credentials and the tenant&rsquo;s ingest secret.</div></div></li>
+          <li><span class="marker">04</span><div><div class="title">Reboot</div><div class="detail">The Gateway restarts onto the facility network.</div></div></li>
+          <li><span class="marker">05</span><div><div class="title">Forwarding</div><div class="detail">Readings start reaching the backend. Nothing further to configure.</div></div></li>
         </ol>
-        <p class="muted">Hold the BOOT button for 3s at power-up to reopen that setup page and reconfigure a unit already in service.</p>
+        <p class="small muted" style="margin-top:16px;">Reconfiguring a unit already in service: hold <kbd>BOOT</kbd> for 3 seconds at power-up to reopen the setup page.</p>
       </div>
-      <div class="panel glass" data-aos="fade-up" data-aos-delay="80">
+
+      <div class="card prov-card">
         <h3>Sensor Node</h3>
-        <p>Never joins your WiFi — it pairs itself directly with the Gateway, and there is nothing to type in:</p>
-        <ol style="font-size:14.5px; line-height:1.7; padding-left:18px; margin:0 0 12px 0; color:var(--ink);">
-          <li>Power it on while the Gateway's pairing window is open (open automatically for a few minutes after every Gateway boot, or reopened anytime with a quick tap of its button)</li>
-          <li>It finds the Gateway and joins within moments, naming itself from its own hardware address (e.g. <code>node-A1B2C3</code>) — no Gateway address or radio channel to enter</li>
-          <li>It shows up under "Newly Detected" on the dashboard's Devices page — name it and assign it to a room from there</li>
+        <p class="role">Nothing to type in. The node finds its Gateway and names itself.</p>
+        <ol class="flow">
+          <li><span class="marker">01</span><div><div class="title">Power the node</div><div class="detail">Mains or USB. Sensor Nodes stay awake so the gas sensor keeps its warm-up.</div></div></li>
+          <li><span class="marker">02</span><div><div class="title">Open the pairing window</div><div class="detail">Open for a few minutes after every Gateway boot, or reopened anytime with a quick tap of the Gateway&rsquo;s button.</div></div></li>
+          <li><span class="marker">03</span><div><div class="title">The node finds the Gateway</div><div class="detail">Discovery is automatic &mdash; no Gateway address or radio channel to enter.</div></div></li>
+          <li><span class="marker">04</span><div><div class="title">It pairs and names itself</div><div class="detail">The node takes an ID from its own hardware address, for example <code>node-A1B2C3</code>.</div></div></li>
+          <li><span class="marker">05</span><div><div class="title">Assign a room</div><div class="detail">It appears under &ldquo;Newly Detected&rdquo; on the dashboard&rsquo;s Devices page. Name it and assign it there.</div></div></li>
         </ol>
-        <p class="muted">Optional: a USB serial console at 115200 baud offers <code>help</code>, <code>show</code> (current pairing status), <code>set deviceid &lt;value&gt;</code> (rename without re-pairing), and <code>pair</code> (force a fresh pairing search — same effect as holding BOOT for 3s at power-up).</p>
+        <p class="small muted" style="margin-top:16px;">A USB serial console is available for advanced use &mdash; see Advanced, below.</p>
       </div>
     </div>
   </div>
 </section>
 
-<footer>
+<!-- ================= FIELD CHECKLIST ================= -->
+<section id="checklist">
   <div class="wrap">
-    <div class="foot-row">
-      <div class="signature">Timothy Mwala — Embedded Systems &amp; Instrumentation</div>
-      <div class="foot-links">
-        <a href="index.html">CYD Applications</a>
-        <a href="https://mwalatimothy.github.io/Portfolio-/" target="_blank" rel="noopener">Portfolio</a>
-        <a href="https://github.com/MwalaTimothy" target="_blank" rel="noopener">GitHub</a>
+    <div class="section-head">
+      <p class="eyebrow">On site</p>
+      <h2>Field installation checklist</h2>
+      <p class="lede">Track one device through a full install. Ticks are saved in this browser only, and clear when you reset them.</p>
+    </div>
+    <div class="card" style="padding:14px 16px;">
+      <ul class="checklist" data-checklist>
+        <li><label><input type="checkbox" data-ck="device" /><span class="ck-text">Correct device selected</span></label></li>
+        <li><label><input type="checkbox" data-ck="cable" /><span class="ck-text">USB data cable connected</span></label></li>
+        <li><label><input type="checkbox" data-ck="flashed" /><span class="ck-text">Firmware installed</span><span class="auto" data-ck-auto hidden>Auto</span></label></li>
+        <li><label><input type="checkbox" data-ck="configured" /><span class="ck-text">Gateway configured</span></label></li>
+        <li><label><input type="checkbox" data-ck="paired" /><span class="ck-text">Sensor Node paired</span></label></li>
+        <li><label><input type="checkbox" data-ck="room" /><span class="ck-text">Room assigned</span></label></li>
+        <li><label><input type="checkbox" data-ck="reporting" /><span class="ck-text">Device reporting data</span></label></li>
+      </ul>
+      <div style="display:flex; justify-content:flex-end; padding:8px 0 2px;">
+        <button class="btn btn-quiet" type="button" data-checklist-reset>Reset checklist</button>
       </div>
     </div>
-    <p class="fine-print">
-      Having trouble flashing? Make sure no other program (Arduino IDE, PlatformIO monitor,
-      etc.) has the serial port open, and try a different USB cable/port if the device isn't
-      detected. Gateway and Sensor Node firmware share this page but are separate installs —
-      flashing one never touches the other.
-    </p>
+  </div>
+</section>
+
+<!-- ================= HARDWARE ================= -->
+<section id="hardware">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>The hardware</h2>
+      <p class="lede">Real Air Sense units, photographed as deployed.</p>
+    </div>
+    <div class="hw-grid">
+      <figure class="card hw-card" style="margin:0;">
+        <img src="assets/gateway.jpg" alt="Air Sense Gateway showing a live grid of temperature, humidity, CO2, eCO2, TVOC, PM and AQI readings from a connected sensor node." loading="lazy" width="1600" height="1200" />
+        <figcaption class="hw-body">
+          <h3>Gateway</h3>
+          <p>Facility communication hub, running its onboard dashboard with live readings from a paired room node.</p>
+        </figcaption>
+      </figure>
+      <figure class="card hw-card" style="margin:0;">
+        <img src="assets/sensor-node.jpg" alt="Three Air Sense Sensor Nodes on breadboards, hand-labelled Living-room-01, Kitchen-01 and bed-room-01." loading="lazy" width="1600" height="1200" />
+        <figcaption class="hw-body">
+          <h3>Sensor Nodes</h3>
+          <p>Room-level sensing. Three paired nodes, each named for the room it monitors.</p>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HELP ================= -->
+<section id="help">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Having trouble?</h2>
+      <p class="lede">The common ones first. Deeper engineering detail is under Advanced.</p>
+    </div>
+
+    <div class="acc">
+      <details class="acc-item">
+        <summary>USB device not detected</summary>
+        <div class="acc-body">
+          <ol>
+            <li>Check the cable carries data &mdash; many charging cables have power lines only.</li>
+            <li>Close the Arduino IDE if it is open.</li>
+            <li>Close any PlatformIO serial monitor.</li>
+            <li>Try another USB port, ideally directly on the machine rather than through a hub.</li>
+            <li>Unplug the device and reconnect it, then try again.</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="acc-item">
+        <summary>Flashing failed part way through</summary>
+        <div class="acc-body">
+          <ol>
+            <li>Leave the device plugged in and start the install again &mdash; a partial write is recoverable, the board is not bricked.</li>
+            <li>Swap the USB cable. Marginal cables commonly fail mid-write rather than at connect.</li>
+            <li>Avoid a USB hub for the retry.</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="acc-item">
+        <summary>The browser cannot access the serial port</summary>
+        <div class="acc-body">
+          <p>Installing needs Web Serial, which today means Chrome, Edge or Opera on a desktop machine. Firefox, Safari and mobile browsers do not support it.</p>
+          <p>Web Serial also requires a secure connection, so the page must be served over HTTPS.</p>
+        </div>
+      </details>
+
+      <details class="acc-item">
+        <summary>The Gateway will not join the facility WiFi</summary>
+        <div class="acc-body">
+          <ol>
+            <li>Hold <kbd>BOOT</kbd> for 3 seconds at power-up to wipe the saved configuration and reopen the setup page.</li>
+            <li>Reconnect to <code>AirSense-Setup-XXXXXX</code> and re-enter the credentials.</li>
+            <li>Confirm the network is 2.4&nbsp;GHz &mdash; the ESP32 does not join 5&nbsp;GHz networks.</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="acc-item">
+        <summary>A Sensor Node will not pair</summary>
+        <div class="acc-body">
+          <ol>
+            <li>Confirm the Gateway&rsquo;s pairing window is open &mdash; tap the Gateway&rsquo;s button to reopen it.</li>
+            <li>Power-cycle the Sensor Node while that window is open.</li>
+            <li>Move the node closer to the Gateway for the initial pairing.</li>
+          </ol>
+        </div>
+      </details>
+
+      <details class="acc-item">
+        <summary>Which Gateway firmware do I install?</summary>
+        <div class="acc-body">
+          <p>Choose by the screen on your board, and the installer asks you before it writes anything:</p>
+          <ul>
+            <li><strong>Touch + Audio Alerts</strong> &mdash; a CYD with a working touchscreen. This is the normal choice.</li>
+            <li><strong>Auto-Scroll</strong> &mdash; a CYD clone or plain display with no touch controller fitted. Same dashboard, advancing to the next node&rsquo;s page every 5 seconds instead of on a tap.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ADVANCED ================= -->
+<section id="advanced">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Advanced</h2>
+      <p class="lede">Engineering detail, kept out of the main flow rather than removed.</p>
+    </div>
+
+    <div class="acc">
+      <details class="acc-item">
+        <summary>Gateway hardware and firmware detail</summary>
+        <div class="acc-body">
+          <div class="table-scroll">
+            <table class="spec-table">
+              <tbody>
+                <tr><th scope="row">Board</th><td>CYD (ESP32-2432S028R) &mdash; 2.8&Prime; ILI9341. A headless plain ESP32 with an SD card is also supported.</td></tr>
+                <tr><th scope="row">Radios</th><td>Direct wireless link to the room nodes, plus WiFi for the backend uplink.</td></tr>
+                <tr><th scope="row">Touch build</th><td>Full touch interface &mdash; Home, per-node pages (Overview, Air Quality, Environment, Alerts, Node Info), live Alerts, and on-device Settings (theme, brightness, thresholds, sound, pairing, factory reset).</td></tr>
+                <tr><th scope="row">Auto-scroll build</th><td>Same dashboard, advancing to the next node&rsquo;s page every 5 seconds &mdash; for a CYD clone or plain ILI9341 with no XPT2046 touch controller.</td></tr>
+                <tr><th scope="row">Audible alerts</th><td>New in v2.1. A 35&nbsp;&times;&nbsp;25&nbsp;mm 8&nbsp;&ohm; speaker plugs into the board&rsquo;s own speaker socket &mdash; no soldering. Sounds a two-beep warning, or a four-beep alarm that repeats until acknowledged, when a room crosses a threshold; plus boot, pairing and touch feedback. Adjustable and fully silenceable from Settings &gt; Sound. Optional: with no speaker fitted the firmware behaves exactly as v2.0.0 did.</td></tr>
+                <tr><th scope="row">Offline resilience</th><td>MicroSD backlog with automatic replay once WiFi returns &mdash; no data lost during an outage.</td></tr>
+                <tr><th scope="row">Provisioning</th><td>WiFi setup page on first boot; hold <kbd>BOOT</kbd> for 3 seconds to reconfigure.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc-item">
+        <summary>Sensor Node hardware and firmware detail</summary>
+        <div class="acc-body">
+          <div class="table-scroll">
+            <table class="spec-table">
+              <tbody>
+                <tr><th scope="row">Board</th><td>ESP32-C3. This build&rsquo;s wired unit: SDA &rarr; GPIO8, SCL &rarr; GPIO10.</td></tr>
+                <tr><th scope="row">Sensors</th><td>ENS160 (eCO&#8322; and TVOC) with an AHT21 (temperature and humidity), on I&sup2;C.</td></tr>
+                <tr><th scope="row">Radio</th><td>Direct wireless link to the Gateway only &mdash; this device never joins your WiFi network.</td></tr>
+                <tr><th scope="row">Power</th><td>Mains or USB, always on. The ENS160 needs continuous warm-up.</td></tr>
+                <tr><th scope="row">Send cadence</th><td>An averaged reading every 5 seconds, with a RAM retry buffer if the Gateway is briefly unreachable.</td></tr>
+                <tr><th scope="row">Provisioning</th><td>Automatic, during the Gateway&rsquo;s pairing window.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc-item">
+        <summary>Serial console</summary>
+        <div class="acc-body">
+          <p>A Sensor Node exposes a USB serial console at <strong>115200 baud</strong>:</p>
+          <ul>
+            <li><code>help</code> &mdash; list commands</li>
+            <li><code>show</code> &mdash; current pairing status</li>
+            <li><code>set deviceid &lt;value&gt;</code> &mdash; rename without re-pairing</li>
+            <li><code>pair</code> &mdash; force a fresh pairing search, the same effect as holding <kbd>BOOT</kbd> for 3 seconds at power-up</li>
+          </ul>
+          <p>Close the console before flashing &mdash; it holds the serial port open and the installer will not be able to claim it.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <span class="logo-plate"><img src="assets/air-sense-logo.png" alt="Air Sense" /></span>
+        <p>Embedded sensing infrastructure for indoor environments.</p>
+        <div class="foot-versions" style="margin-top:14px;">
+          <span class="pill">Gateway v2.1.0</span>
+          <span class="pill">Node v1.1.0</span>
+        </div>
+      </div>
+
+      <div class="foot-col">
+        <h3>Firmware</h3>
+        <ul>
+          <li><a href="#install">Install</a></li>
+          <li><a href="#advanced">Gateway detail</a></li>
+          <li><a href="#advanced">Sensor Node detail</a></li>
+        </ul>
+      </div>
+
+      <div class="foot-col">
+        <h3>Deployment</h3>
+        <ul>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#provisioning">Provisioning</a></li>
+          <li><a href="#checklist">Field checklist</a></li>
+          <li><a href="#help">Help</a></li>
+        </ul>
+      </div>
+
+      <div class="foot-col">
+        <h3>Elsewhere</h3>
+        <ul>
+          <li><a href="index.html">CYD Applications</a></li>
+          <li><a href="https://mwalatimothy.github.io/Portfolio-/" target="_blank" rel="noopener">Portfolio</a></li>
+          <li><a href="https://github.com/MwalaTimothy" target="_blank" rel="noopener">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="foot-bottom">
+      <span>Timothy Mwala &mdash; Embedded Systems &amp; Instrumentation</span>
+      <span>Gateway and Sensor Node firmware are separate installs &mdash; flashing one never touches the other.</span>
+    </div>
   </div>
 </footer>
 
-<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-<script>if (window.AOS) AOS.init({ duration: 650, easing: "ease-out-cubic", once: true, offset: 40 });</script>
+<!-- ================= INSTALLER DIALOG =================
+     One dialog, reconfigured per device. The real esp-web-install-button
+     elements live inside it and are never activated programmatically: the
+     technician clicks the actual ESP Web Tools button, which opens its own
+     connect/detect/erase/write flow. This dialog is pre-flight only.
+-->
+<dialog class="installer" id="installer" aria-labelledby="installer-title">
+  <form method="dialog" class="dlg-head">
+    <div>
+      <h2 id="installer-title" data-dlg-title>Install</h2>
+      <p class="sub" data-dlg-sub></p>
+    </div>
+    <button class="dlg-close" type="submit" aria-label="Close" value="close">&times;</button>
+  </form>
+
+  <div class="dlg-body">
+
+    <!-- Gateway-only: which display is fitted -->
+    <fieldset class="variant" data-variant-group hidden>
+      <legend class="dlg-section-label">Which display do you have?</legend>
+      <label>
+        <input type="radio" name="gw-variant" value="touch" checked />
+        <span class="variant-text">
+          <span class="variant-name">CYD with touchscreen <span class="rec">Recommended</span></span>
+          <span class="variant-desc">Touch + Audio Alerts. The standard ESP32-2432S028R.</span>
+        </span>
+      </label>
+      <label>
+        <input type="radio" name="gw-variant" value="notouch" />
+        <span class="variant-text">
+          <span class="variant-name">Display without touch</span>
+          <span class="variant-desc">Auto-Scroll. A clone or plain panel with no touch controller fitted.</span>
+        </span>
+      </label>
+    </fieldset>
+
+    <div>
+      <p class="dlg-section-label">Before you start</p>
+      <ul class="preflight">
+        <li><span class="tick" aria-hidden="true">&check;</span> Chrome, Edge or Opera on a desktop machine</li>
+        <li><span class="tick" aria-hidden="true">&check;</span> A USB cable that carries data, not power only</li>
+        <li><span class="tick" aria-hidden="true">&check;</span> The device plugged in and powered</li>
+        <li><span class="tick" aria-hidden="true">&check;</span> No serial monitor holding the port open</li>
+      </ul>
+    </div>
+
+    <!-- Live state, driven entirely by esp-web-tools events -->
+    <div class="flash-status" data-flash-status>
+      <div class="progress-track" role="progressbar" aria-label="Flashing progress" aria-valuemin="0" aria-valuemax="100" data-progress hidden>
+        <div class="progress-fill" data-progress-fill></div>
+      </div>
+      <p class="flash-msg" data-flash-msg aria-live="polite"></p>
+    </div>
+
+    <div class="notice" data-tone="ok" data-success-panel hidden>
+      <h3>Installation complete</h3>
+      <p data-success-text></p>
+      <p style="margin-top:10px;"><a href="#provisioning" data-goto-provisioning>Continue to provisioning &rarr;</a></p>
+    </div>
+  </div>
+
+  <div class="dlg-foot">
+    <!-- Gateway, touch build -->
+    <esp-web-install-button manifest="manifests/air-sense-gateway.json" data-installer="gateway-touch" hidden>
+      <button slot="activate" class="btn btn-accent btn-block" type="button">Connect &amp; install Gateway</button>
+      <span slot="unsupported" class="unsupported">This browser cannot access USB serial ports. Use Chrome, Edge or Opera on a desktop machine.</span>
+      <span slot="not-allowed" class="not-allowed">Web Serial needs a secure connection. This page is not being served over HTTPS.</span>
+    </esp-web-install-button>
+
+    <!-- Gateway, no-touch build -->
+    <esp-web-install-button manifest="manifests/air-sense-gateway-notouch.json" data-installer="gateway-notouch" hidden>
+      <button slot="activate" class="btn btn-accent btn-block" type="button">Connect &amp; install Gateway</button>
+      <span slot="unsupported" class="unsupported">This browser cannot access USB serial ports. Use Chrome, Edge or Opera on a desktop machine.</span>
+      <span slot="not-allowed" class="not-allowed">Web Serial needs a secure connection. This page is not being served over HTTPS.</span>
+    </esp-web-install-button>
+
+    <!-- Sensor Node -->
+    <esp-web-install-button manifest="manifests/air-sense-sensor-node.json" data-installer="node" hidden>
+      <button slot="activate" class="btn btn-accent btn-block" type="button">Connect &amp; install Sensor Node</button>
+      <span slot="unsupported" class="unsupported">This browser cannot access USB serial ports. Use Chrome, Edge or Opera on a desktop machine.</span>
+      <span slot="not-allowed" class="not-allowed">Web Serial needs a secure connection. This page is not being served over HTTPS.</span>
+    </esp-web-install-button>
+
+    <p class="small muted" data-dlg-foot-note>Your browser will ask which serial port to use once you continue.</p>
+  </div>
+</dialog>
+
+<script src="airsense.js"></script>
 </body>
 </html>

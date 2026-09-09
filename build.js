@@ -1,6 +1,6 @@
 // Builds the deployable site into dist/: copies static assets as-is and
-// replaces app.js with a minified/mangled build so the readable source
-// never reaches the published GitHub Pages site.
+// replaces every JS entry point with a minified/mangled build so the readable
+// source never reaches the published GitHub Pages site.
 const fs = require("fs");
 const path = require("path");
 const { minify } = require("terser");
@@ -10,6 +10,11 @@ const DIST = path.join(ROOT, "dist");
 
 const COPY_FILES = ["index.html", "apps.html", "airsense.html", "styles.css", "styles-airsense.css"];
 const COPY_DIRS = ["manifests", "firmware", "assets"];
+
+// Minified rather than copied. Anything a page loads with a <script src> must
+// be listed here — a file that is neither in COPY_FILES nor here simply does
+// not exist in dist/, and 404s on Pages while working perfectly in local dev.
+const MINIFY_FILES = ["app.js", "airsense.js"];
 
 function copyRecursive(src, dest) {
   const stat = fs.statSync(src);
@@ -34,12 +39,14 @@ async function build() {
     copyRecursive(path.join(ROOT, dir), path.join(DIST, dir));
   }
 
-  const source = fs.readFileSync(path.join(ROOT, "app.js"), "utf8");
-  const result = await minify(source, { mangle: true, compress: true });
-  if (result.error) throw result.error;
-  fs.writeFileSync(path.join(DIST, "app.js"), result.code);
+  for (const file of MINIFY_FILES) {
+    const source = fs.readFileSync(path.join(ROOT, file), "utf8");
+    const result = await minify(source, { mangle: true, compress: true });
+    if (result.error) throw result.error;
+    fs.writeFileSync(path.join(DIST, file), result.code);
+  }
 
-  console.log("Build complete -> dist/");
+  console.log(`Build complete -> dist/ (${MINIFY_FILES.length} scripts minified)`);
 }
 
 build().catch((err) => {
