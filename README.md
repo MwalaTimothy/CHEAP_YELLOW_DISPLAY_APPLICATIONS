@@ -55,9 +55,9 @@ sharing this same ESP Web Tools install flow:
 
 | Firmware | Board | Notes |
 |---|---|---|
-| Gateway (Touch) | ESP32 (CYD / ESP32-2432S028R) | ESP-NOW receiver for up to 4 Sensor Nodes + WiFi uplink; tap the touchscreen to page between nodes |
+| Gateway (Touch + Audio Alerts) | ESP32 (CYD / ESP32-2432S028R) | Receives from up to 4 Sensor Nodes over a direct wireless link, forwards over WiFi; tap the touchscreen to page between nodes. v2.1 adds an audible alarm on threshold breaches via a speaker plugged into the board's own speaker socket |
 | Gateway (No-Touch / Auto-Scroll) | ESP32 / CYD clone with no XPT2046 | Identical firmware, dashboard auto-advances between node pages on a timer instead |
-| Sensor Node | ESP32-C3 | One binary for every node — device ID/pairing is all zero-config, handled automatically over ESP-NOW, not baked into the build |
+| Sensor Node | ESP32-C3 | One binary for every node — device ID/pairing is all zero-config, negotiated wirelessly with the Gateway, not baked into the build |
 
 Unlike Rolling Clock, none of this is built with PlatformIO — see "Updating Air Sense firmware"
 below for the actual (Arduino-CLI-based) build process.

@@ -83,7 +83,7 @@
       <div class="highlight" data-aos="fade-up" data-aos-delay="160">
         <div class="ico">📶</div>
         <h3>3. Provision it</h3>
-        <p>Gateways set up over a WiFi captive portal; Sensor Nodes pair automatically over ESP-NOW, no typing required. See <a href="#provisioning" style="color:var(--accent-1); font-weight:600;">Provisioning reference</a>.</p>
+        <p>Gateways set up over a WiFi setup page; Sensor Nodes pair themselves wirelessly, no typing required. See <a href="#provisioning" style="color:var(--accent-1); font-weight:600;">Provisioning reference</a>.</p>
       </div>
     </div>
   </div>
@@ -94,7 +94,7 @@
     <p class="section-eyebrow">Live on the hardware</p>
     <h2 class="section-title">The Gateway's onboard dashboard</h2>
     <p class="section-lede">
-      Every Gateway drives a live LVGL dashboard on its screen — one page per connected
+      Every Gateway drives a live dashboard on its screen — one page per connected
       Sensor Node, tap anywhere to advance, auto-labelled with delivery status
       (<code>Forwarded</code> to the backend, or <code>Queued to SD</code> during a WiFi outage).
       This strip loops real units running this exact firmware.
@@ -107,7 +107,7 @@
         </figure>
         <figure>
           <img src="assets/sensor-node.jpg" alt="Three Air Sense Sensor Nodes on breadboards, labelled Living-room-01, Kitchen-01, and bed-room-01" />
-          <figcaption><strong>Three provisioned nodes</strong>Living-room-01, Kitchen-01, bed-room-01 — each broadcasting its averaged reading over ESP-NOW every 5s.</figcaption>
+          <figcaption><strong>Three provisioned nodes</strong>Living-room-01, Kitchen-01, bed-room-01 — each sending its averaged reading wirelessly to the Gateway every 5s.</figcaption>
         </figure>
         <!-- duplicated for a seamless CSS loop — keep in sync with the set above -->
         <figure aria-hidden="true">
@@ -116,7 +116,7 @@
         </figure>
         <figure aria-hidden="true">
           <img src="assets/sensor-node.jpg" alt="" />
-          <figcaption><strong>Three provisioned nodes</strong>Living-room-01, Kitchen-01, bed-room-01 — each broadcasting its averaged reading over ESP-NOW every 5s.</figcaption>
+          <figcaption><strong>Three provisioned nodes</strong>Living-room-01, Kitchen-01, bed-room-01 — each sending its averaged reading wirelessly to the Gateway every 5s.</figcaption>
         </figure>
       </div>
     </div>
@@ -127,25 +127,26 @@
   <div class="wrap">
     <p class="section-eyebrow">Hardware · Hub</p>
     <h2 class="section-title">Air Sense Gateway</h2>
-    <p class="section-lede">The always-on hub for one facility zone: listens for every Sensor Node over ESP-NOW, forwards readings to the backend over WiFi, and backlogs to a MicroSD card when the network is down.</p>
+    <p class="section-lede">The always-on hub for one facility zone: listens for every Sensor Node over a direct wireless link, forwards readings to the backend over WiFi, and backlogs to a MicroSD card when the network is down. As of v2.1 it can also sound an audible alarm the moment a room crosses a threshold.</p>
 
     <div class="device-grid">
       <div class="device-card glass" data-aos="fade-up">
         <div class="device-card-head">
           <div>
             <h2>Gateway firmware</h2>
-            <span class="device-sub">v2.0.0 · ESP32 (CYD / ESP32-2432S028R)</span>
+            <span class="device-sub">v2.1.0 · ESP32 (CYD / ESP32-2432S028R)</span>
           </div>
           <div class="badge-row"><span class="badge live">Production</span></div>
         </div>
         <p class="app-desc">
-          Dual-mode ESP32 firmware: ESP-NOW receiver for up to 4 Sensor Nodes plus a WiFi
-          uplink to the Air Sense backend, with a live LVGL dashboard and MicroSD offline
-          backlog built in. Two display builds — pick whichever matches your screen.
+          Dual-radio firmware: receives from up to 4 Sensor Nodes over a direct wireless
+          link, and forwards to the Air Sense backend over WiFi — with a live touch
+          dashboard, audible alerts, and MicroSD offline backlog built in. Two display
+          builds — pick whichever matches your screen.
         </p>
         <div class="install-row">
           <esp-web-install-button manifest="manifests/air-sense-gateway.json">
-            <button slot="activate" class="btn btn-primary btn-block">Install Gateway firmware (Touch)</button>
+            <button slot="activate" class="btn btn-primary btn-block">Install Gateway firmware (Touch + Audio Alerts)</button>
             <span slot="unsupported" class="unsupported">Your browser doesn't support Web Serial. Use Chrome or Edge on desktop.</span>
             <span slot="not-allowed" class="not-allowed">Web Serial needs HTTPS. You're seeing this because the page isn't served securely.</span>
           </esp-web-install-button>
@@ -162,11 +163,12 @@
       <div class="glass device-card" data-aos="fade-up" data-aos-delay="80">
         <table class="spec-table">
           <tr><th>Board</th><td>CYD (ESP32-2432S028R) — 2.8" ILI9341; headless plain ESP32 + SD also supported</td></tr>
-          <tr><th>Radios</th><td>ESP-NOW (room nodes) + WiFi (backend uplink)</td></tr>
-          <tr><th>Touch build</th><td>Full touch HMI as of v2.0.0 — Home, per-node pages (Overview/Air Quality/Environment/Alerts/Node Info), live Alerts, and on-device Settings (theme, brightness, thresholds, pairing, factory reset)</td></tr>
+          <tr><th>Radios</th><td>Direct wireless link to the room nodes + WiFi for the backend uplink</td></tr>
+          <tr><th>Touch build</th><td>Full touch interface — Home, per-node pages (Overview/Air Quality/Environment/Alerts/Node Info), live Alerts, and on-device Settings (theme, brightness, thresholds, sound, pairing, factory reset)</td></tr>
           <tr><th>No-Touch build</th><td>Same dashboard, auto-advances to the next node's page every 5s — for a CYD clone/plain ILI9341 with no XPT2046 touch chip</td></tr>
+          <tr><th>Audible alerts</th><td>New in v2.1 — plugs a 35 x 25 mm 8 ohm speaker into the board's own speaker socket (no soldering). Sounds a two-beep warning or a repeating four-beep alarm when a room crosses a threshold, plus boot, pairing and touch feedback. Fully adjustable, and silenceable, from Settings &gt; Sound. Optional: with no speaker fitted the firmware behaves exactly as before</td></tr>
           <tr><th>Offline resilience</th><td>MicroSD backlog, auto-replay once WiFi returns — zero data loss</td></tr>
-          <tr><th>Provisioning</th><td>WiFi captive portal on first boot; hold BOOT 3s to reprovision</td></tr>
+          <tr><th>Provisioning</th><td>WiFi setup page on first boot; hold BOOT 3s to reconfigure</td></tr>
         </table>
       </div>
     </div>
@@ -177,7 +179,7 @@
   <div class="wrap">
     <p class="section-eyebrow">Hardware · Room node</p>
     <h2 class="section-title">Air Sense Sensor Node</h2>
-    <p class="section-lede">Always-on room monitor: samples temperature, humidity, eCO₂, and TVOC every few seconds and broadcasts a lightly-averaged reading to the Gateway over ESP-NOW. Mains/USB powered — no sleep, so the gas sensor stays warmed up.</p>
+    <p class="section-lede">Always-on room monitor: samples temperature, humidity, eCO₂, and TVOC every few seconds and sends a lightly-averaged reading straight to the Gateway over its own wireless link. Mains/USB powered — no sleep, so the gas sensor stays warmed up.</p>
 
     <div class="device-grid">
       <div class="device-card glass" data-aos="fade-up">
@@ -189,8 +191,9 @@
           <div class="badge-row"><span class="badge live">Production</span></div>
         </div>
         <p class="app-desc">
-          One binary flashes to every Sensor Node — it pairs with a Gateway automatically over
-          ESP-NOW after flashing, no device ID, Gateway address, or channel to type in.
+          One binary flashes to every Sensor Node — it finds and pairs with a Gateway by
+          itself after flashing, with no device ID, Gateway address, or radio channel to
+          type in.
         </p>
         <div class="install-row">
           <esp-web-install-button manifest="manifests/air-sense-sensor-node.json">
@@ -205,10 +208,10 @@
         <table class="spec-table">
           <tr><th>Board</th><td>ESP32-C3 (this build's wired unit: SDA → GPIO8, SCL → GPIO10)</td></tr>
           <tr><th>Sensors</th><td>ENS160 (eCO₂ + TVOC) + AHT21 (temp/humidity) combo, I2C</td></tr>
-          <tr><th>Radio</th><td>ESP-NOW only — no WiFi connection made on this device</td></tr>
+          <tr><th>Radio</th><td>Direct wireless link to the Gateway only — this device never joins your WiFi network</td></tr>
           <tr><th>Power</th><td>Mains/USB, always-on (ENS160 needs continuous warm-up)</td></tr>
           <tr><th>Send cadence</th><td>Averaged reading every 5s; RAM retry buffer if the Gateway is briefly unreachable</td></tr>
-          <tr><th>Provisioning</th><td>Automatic over ESP-NOW during the Gateway's pairing window; optional serial console at 115200 baud for advanced use</td></tr>
+          <tr><th>Provisioning</th><td>Automatic, during the Gateway's pairing window; optional serial console at 115200 baud for advanced use</td></tr>
         </table>
       </div>
     </div>
@@ -222,20 +225,20 @@
     <div class="panel-2col">
       <div class="panel glass" data-aos="fade-up">
         <h3>Gateway</h3>
-        <p>On first boot (or after a BOOT-hold reset), the Gateway opens a WiFi access point:</p>
+        <p>On first boot (or after a BOOT-hold reset), the Gateway broadcasts its own temporary WiFi network:</p>
         <ol style="font-size:14.5px; line-height:1.7; padding-left:18px; margin:0 0 12px 0; color:var(--ink);">
           <li>Connect a phone/laptop to <code>AirSense-Setup-XXXXXX</code></li>
-          <li>The captive portal opens automatically — enter the facility WiFi credentials and the tenant's ingest secret</li>
+          <li>A setup page opens automatically — enter the facility WiFi credentials and the tenant's ingest secret</li>
           <li>It reboots onto that network and starts forwarding readings</li>
         </ol>
-        <p class="muted">Hold the BOOT button for 3s at power-up to reopen the portal and reconfigure a unit already in service.</p>
+        <p class="muted">Hold the BOOT button for 3s at power-up to reopen that setup page and reconfigure a unit already in service.</p>
       </div>
       <div class="panel glass" data-aos="fade-up" data-aos-delay="80">
         <h3>Sensor Node</h3>
-        <p>No WiFi radio — pairs with the Gateway automatically over ESP-NOW, nothing to type in:</p>
+        <p>Never joins your WiFi — it pairs itself directly with the Gateway, and there is nothing to type in:</p>
         <ol style="font-size:14.5px; line-height:1.7; padding-left:18px; margin:0 0 12px 0; color:var(--ink);">
           <li>Power it on while the Gateway's pairing window is open (open automatically for a few minutes after every Gateway boot, or reopened anytime with a quick tap of its button)</li>
-          <li>It finds the Gateway and joins within moments, self-assigned a MAC-derived device ID (e.g. <code>node-A1B2C3</code>) — no manual Gateway address or channel entry</li>
+          <li>It finds the Gateway and joins within moments, naming itself from its own hardware address (e.g. <code>node-A1B2C3</code>) — no Gateway address or radio channel to enter</li>
           <li>It shows up under "Newly Detected" on the dashboard's Devices page — name it and assign it to a room from there</li>
         </ol>
         <p class="muted">Optional: a USB serial console at 115200 baud offers <code>help</code>, <code>show</code> (current pairing status), <code>set deviceid &lt;value&gt;</code> (rename without re-pairing), and <code>pair</code> (force a fresh pairing search — same effect as holding BOOT for 3s at power-up).</p>
